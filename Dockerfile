@@ -16,7 +16,7 @@ COPY tsconfig.json next.config.ts postcss.config.mjs ./
 
 # Hardcode the API URL for production
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://backend:8000
+ENV NEXT_PUBLIC_API_URL=http://backend:8080
 
 # Build the application
 RUN pnpm run build

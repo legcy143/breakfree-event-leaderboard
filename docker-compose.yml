@@ -20,7 +20,7 @@ services:
     depends_on:
       - mongodb
     ports:
-      - "8000:8000"
+      - "8080:8080"
     networks:
       - app-network
 
@@ -33,7 +33,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "3006:3000"
+      - "8000:8000"
     networks:
       - app-network
 
