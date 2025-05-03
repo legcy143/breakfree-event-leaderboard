@@ -2,22 +2,22 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files first (for better layer caching)
+# Copy package files
 COPY package.json ./
 
-# Install pnpm and dependencies
+# Install dependencies
 RUN npm install -g pnpm
 RUN pnpm install
 
 # Copy the rest of the application
 COPY . .
 
-# Set environment variables for Next.js
+# Hardcode the API URL for production
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://localhost:8000
+ENV NEXT_PUBLIC_API_URL=http://backend:5000
 
 # Build the application
-RUN pnpm build
+RUN pnpm run build
 
 # Expose the port
 EXPOSE 3000

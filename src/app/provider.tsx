@@ -4,8 +4,8 @@ import { Team, teamsData as initialTeamsData } from '@/data/teams'
 import type { Socket } from 'socket.io-client'
 import { initSocket } from '@/utils/socket'
 
-// Get the API URL from environment variables or use the default
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Hardcoded API URL for Docker environment
+const API_URL = 'http://backend:5000';
 
 // Create the context
 type TeamsContextType = {
