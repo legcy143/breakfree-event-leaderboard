@@ -5,7 +5,7 @@ import type { Socket } from 'socket.io-client'
 import { initSocket } from '@/utils/socket'
 
 // Hardcoded API URL for Docker environment
-const API_URL = 'https://break-free-backend.gokapturehub.com/';
+const API_URL = 'https://break-free-backend.gokapturehub.com';
 
 // Create the context
 type TeamsContextType = {
