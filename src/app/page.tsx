@@ -66,11 +66,11 @@ export default function page() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}>
-      <div className='h-16 px-5'>
+      <div className='h-20 px-5'>
         <img src={assets.logo} className='h-full w-fit object-contain mx-auto md:mx-0' />
       </div>
       <h1 className=' text-center  uppercase text-3xl lg:text-5xl font-bold text-brand mt-1 mb-16'>live scoreboard</h1>
-      <section className='max-w-[70rem] mx-auto flex-1 h-[calc(80%-1rem)]  overflow-y-auto'>
+      <section className='max-w-[70rem] mx-auto flex-1 h-[calc(80%-1.5rem)]  overflow-y-auto'>
         {
           data.map((item, index) => {
             return (
