@@ -1,7 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 
 // Hardcoded API URL for Docker environment
-const API_URL = 'http://backend:8080';
+const API_URL = 'http://backend:8081';
 
 /**
  * Initialize Socket.IO connection
