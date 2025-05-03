@@ -2,19 +2,21 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json ./
+# Copy package files and lock file
+COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
+# Install dependencies with pnpm
 RUN npm install -g pnpm
-RUN pnpm install
+RUN pnpm install --frozen-lockfile || pnpm install
 
-# Copy the rest of the application
-COPY . .
+# Copy only frontend files, excluding backend
+COPY public ./public
+COPY src ./src
+COPY tsconfig.json next.config.ts postcss.config.mjs next-env.d.ts ./
 
 # Hardcode the API URL for production
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://backend:5000
+ENV NEXT_PUBLIC_API_URL=http://backend:8000
 
 # Build the application
 RUN pnpm run build

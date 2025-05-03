@@ -17,12 +17,12 @@ RUN npm run build
 
 # Set hardcoded production environment
 ENV NODE_ENV=production
-ENV PORT=5000
+ENV PORT=8000
 ENV MONGODB_URI=mongodb://mongodb:27017/breakfree-leaderboard
 ENV CORS_ORIGIN=http://frontend:3000
 
 # Expose the port
-EXPOSE 5000
+EXPOSE 8000
 
 # Start the application
 CMD ["node", "dist/index.js"]
