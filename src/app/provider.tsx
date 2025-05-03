@@ -5,7 +5,7 @@ import type { Socket } from 'socket.io-client'
 import { initSocket } from '@/utils/socket'
 
 // Hardcoded API URL for Docker environment
-const API_URL = 'http://backend:5000';
+const API_URL = 'http://backend:8000';
 
 // Create the context
 type TeamsContextType = {
