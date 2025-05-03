@@ -12,7 +12,7 @@ RUN pnpm install --frozen-lockfile || pnpm install
 # Copy only frontend files, excluding backend
 COPY public ./public
 COPY src ./src
-COPY tsconfig.json next.config.ts postcss.config.mjs next-env.d.ts ./
+COPY tsconfig.json next.config.ts postcss.config.mjs ./
 
 # Hardcode the API URL for production
 ENV NODE_ENV=production
