@@ -19,7 +19,7 @@ RUN npm run build
 ENV NODE_ENV=production
 ENV PORT=8000
 ENV MONGODB_URI=mongodb://mongodb:27017/breakfree-leaderboard
-ENV CORS_ORIGIN=http://frontend:3000
+ENV CORS_ORIGIN=https://break-free.gokapturehub.com
 
 # Expose the port
 EXPOSE 8000
