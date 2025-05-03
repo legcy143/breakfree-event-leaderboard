@@ -69,12 +69,12 @@ export default function page() {
       <div className='h-16 px-5'>
         <img src={assets.logo} className='h-full w-fit object-contain mx-auto md:mx-0' />
       </div>
-      <h1 className=' text-center  uppercase text-3xl lg:text-5xl font-bold text-brand mt-1 mb-5'>LEADER board</h1>
-      <section className='max-w-[70rem] mx-auto flex-1 h-[80%]  overflow-y-auto'>
+      <h1 className=' text-center  uppercase text-3xl lg:text-5xl font-bold text-brand mt-1 mb-16'>live scoreboard</h1>
+      <section className='max-w-[70rem] mx-auto flex-1 h-[calc(80%-1rem)]  overflow-y-auto'>
         {
           data.map((item, index) => {
             return (
-              <div key={index} className='flex justify-between items-center p-4 gap-5 lg:gap-10'>
+              <div key={index} className='flex justify-between items-center p-4 gap-5 lg:gap-10 border-b border-brand/20'>
                 <span className='bg-brand shrink-0 size-[1.5rem] md:size-[2rem] grid place-items-center rounded-full text-white font-bold' >{index + 1}</span>
                 <img src={item.img} className='h-[1.5rem] w-[30%] object-contain  md:h-[2rem] lg:h-[3rem] mr-auto' />
                 <h2 className='text-[3vw] md:text-2xl  w-full text-center font-bold text-brand mr-auto truncate'>{item.name}</h2>
