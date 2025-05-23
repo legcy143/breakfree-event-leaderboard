@@ -102,6 +102,97 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
       }
     });
 
+    // Listen for delete team events
+    socket.on('deleteTeam', async (data: { teamId: string }) => {
+      try {
+        const { teamId } = data;
+        
+        if (!teamId) {
+          console.error('Invalid delete team request: missing teamId');
+          return;
+        }
+        
+        // Find and delete the team
+        const team = await Team.findByIdAndDelete(teamId);
+        
+        if (!team) {
+          console.error(`Team not found with ID: ${teamId}`);
+          return;
+        }
+        
+        // Get all teams sorted by score
+        const leaderboard = await Team.find().sort({ score: -1 });
+        
+        // Emit the updated leaderboard to all connected clients
+        io?.emit('teamDeleted', {
+          teams: leaderboard,
+          deletedTeam: {
+            _id: team._id,
+            name: team.name,
+            companyName: team.companyName,
+            score: team.score
+          }
+        });
+        
+        console.log(`Team deleted: ${team.name}`);
+      } catch (error) {
+        console.error('Error deleting team via socket:', error);
+      }
+    });
+
+    // Listen for update team events
+    socket.on('updateTeam', async (data: { teamId: string; name?: string; companyName?: string; score?: string }) => {
+      try {
+        const { teamId, name, companyName, score } = data;
+        
+        if (!teamId) {
+          console.error('Invalid update team request: missing teamId');
+          return;
+        }
+        
+        // Find the team
+        const team = await Team.findById(teamId);
+        if (!team) {
+          console.error(`Team not found with ID: ${teamId}`);
+          return;
+        }
+        
+        // Check for name uniqueness if name is being changed
+        if (name && name !== team.name) {
+          const existingTeam = await Team.findOne({ name });
+          if (existingTeam) {
+            console.error(`Cannot update: another team with name ${name} already exists`);
+            return;
+          }
+        }
+        
+        // Update team details
+        if (name) team.name = name;
+        if (companyName) team.companyName = companyName;
+        if (score !== undefined) team.score = parseInt(score) || 0;
+        
+        await team.save();
+        
+        // Get all teams sorted by score
+        const leaderboard = await Team.find().sort({ score: -1 });
+        
+        // Emit the updated leaderboard to all connected clients
+        io?.emit('teamUpdated', {
+          teams: leaderboard,
+          updatedTeam: {
+            _id: team._id,
+            name: team.name,
+            companyName: team.companyName,
+            score: team.score
+          }
+        });
+        
+        console.log(`Team updated: ${team.name}`);
+      } catch (error) {
+        console.error('Error updating team via socket:', error);
+      }
+    });
+
     socket.on('disconnect', () => {
       console.log(`Socket disconnected: ${socket.id}`);
     });

@@ -13,6 +13,8 @@ type TeamsContextType = {
   teams: Team[];
   updateTeamScore: (teamName: string, points: string, isDeduction?: boolean) => Promise<boolean>;
   addNewTeam: (name: string, companyName: string, score: string) => Promise<boolean>;
+  deleteTeam: (teamId: string) => Promise<boolean>;
+  updateTeam: (teamId: string, name: string, companyName: string, score: string) => Promise<boolean>;
   isLoading: boolean;
   lastUpdated: Team | null;
   animatingTeam: string | null;
@@ -85,6 +87,7 @@ export default function Provider({ children }: { children: ReactNode }) {
         if (data && data.teams) {
           // Transform the MongoDB data to match our Team type
           const formattedTeams = data.teams.map((team: any) => ({
+            id: team._id,
             name: team.name,
             companyName: team.companyName,
             score: String(team.score),
@@ -95,6 +98,59 @@ export default function Provider({ children }: { children: ReactNode }) {
           // Set the last updated team for animation purposes
           if (data.updatedTeam) {
             setLastUpdated({
+              id: data.updatedTeam._id,
+              name: data.updatedTeam.name,
+              companyName: data.updatedTeam.companyName,
+              score: String(data.updatedTeam.score),
+            });
+            
+            // Set the animating team ID
+            setAnimatingTeam(data.updatedTeam.name);
+            
+            // Clear animation after a delay
+            setTimeout(() => {
+              setAnimatingTeam(null);
+            }, 2000); // Animation duration
+          }
+        }
+      });
+
+      // Listen for team deleted events
+      socket.on('teamDeleted', (data: any) => {
+        console.log('Team deleted event received:', data);
+        
+        if (data && data.teams) {
+          // Transform the MongoDB data to match our Team type
+          const formattedTeams = data.teams.map((team: any) => ({
+            id: team._id,
+            name: team.name,
+            companyName: team.companyName,
+            score: String(team.score),
+          }));
+          
+          setTeams(formattedTeams);
+        }
+      });
+
+      // Listen for team updated events
+      socket.on('teamUpdated', (data: any) => {
+        console.log('Team updated event received:', data);
+        
+        if (data && data.teams) {
+          // Transform the MongoDB data to match our Team type
+          const formattedTeams = data.teams.map((team: any) => ({
+            id: team._id,
+            name: team.name,
+            companyName: team.companyName,
+            score: String(team.score),
+          }));
+          
+          setTeams(formattedTeams);
+          
+          // Set the last updated team for animation purposes
+          if (data.updatedTeam) {
+            setLastUpdated({
+              id: data.updatedTeam._id,
               name: data.updatedTeam.name,
               companyName: data.updatedTeam.companyName,
               score: String(data.updatedTeam.score),
@@ -146,6 +202,7 @@ export default function Provider({ children }: { children: ReactNode }) {
         if (data && data.length > 0) {
           // Transform the MongoDB data to match our Team type
           const formattedTeams = data.map((team: any) => ({
+            id: team._id,
             name: team.name,
             companyName: team.companyName,
             score: String(team.score),
@@ -255,6 +312,7 @@ export default function Provider({ children }: { children: ReactNode }) {
           if (data.leaderboard) {
             // Transform the MongoDB data to match our Team type
             const formattedTeams = data.leaderboard.map((team: any) => ({
+              id: team._id,
               name: team.name,
               companyName: team.companyName,
               score: String(team.score),
@@ -272,8 +330,89 @@ export default function Provider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Function to delete a team
+  const deleteTeam = async (teamId: string): Promise<boolean> => {
+    try {
+      // Using Socket.IO to delete a team
+      if (socketRef.current && socketRef.current.connected) {
+        socketRef.current.emit('deleteTeam', { teamId });
+        return true;
+      } else {
+        console.warn('Socket not connected. Falling back to API call.');
+        // Fallback to direct API call if socket is not connected
+        const response = await fetch(`${API_URL}/api/teams/${teamId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.leaderboard) {
+            // Transform the MongoDB data to match our Team type
+            const formattedTeams = data.leaderboard.map((team: any) => ({
+              id: team._id,
+              name: team.name,
+              companyName: team.companyName,
+              score: String(team.score),
+            }));
+            
+            setTeams(formattedTeams);
+          }
+          return true;
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error('Error deleting team:', error);
+      return false;
+    }
+  };
+
+  // Function to update a team's details
+  const updateTeam = async (teamId: string, name: string, companyName: string, score: string): Promise<boolean> => {
+    try {
+      // Using Socket.IO to update the team
+      if (socketRef.current && socketRef.current.connected) {
+        socketRef.current.emit('updateTeam', { teamId, name, companyName, score });
+        return true;
+      } else {
+        console.warn('Socket not connected. Falling back to API call.');
+        // Fallback to direct API call if socket is not connected
+        const response = await fetch(`${API_URL}/api/teams/${teamId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, companyName, score }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.leaderboard) {
+            // Transform the MongoDB data to match our Team type
+            const formattedTeams = data.leaderboard.map((team: any) => ({
+              id: team._id,
+              name: team.name,
+              companyName: team.companyName,
+              score: String(team.score),
+            }));
+            
+            setTeams(formattedTeams);
+          }
+          return true;
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error('Error updating team:', error);
+      return false;
+    }
+  };
+
   return (
-    <TeamsContext.Provider value={{ teams, updateTeamScore, addNewTeam, isLoading, lastUpdated, animatingTeam }}>
+    <TeamsContext.Provider value={{ teams, updateTeamScore, addNewTeam, isLoading, lastUpdated, animatingTeam, deleteTeam, updateTeam }}>
       {children}
     </TeamsContext.Provider>
   );

@@ -185,3 +185,119 @@ export const addTeam = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: 'Server Error' });
   }
 };
+
+/**
+ * Delete a team
+ * @route DELETE /api/teams/:teamId
+ * @access Public
+ */
+export const deleteTeam = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const teamId = req.params.teamId;
+
+    if (!teamId) {
+      res.status(400).json({ message: 'Team ID is required' });
+      return;
+    }
+
+    // Find and delete the team
+    const team = await Team.findByIdAndDelete(teamId);
+    
+    if (!team) {
+      res.status(404).json({ message: 'Team not found' });
+      return;
+    }
+
+    // Get all teams sorted by score
+    const teams = await Team.find().sort({ score: -1 });
+
+    // Emit the updated leaderboard to all connected clients
+    const io = getIo();
+    if (io) {
+      io.emit('teamDeleted', { 
+        teams,
+        deletedTeam: {
+          _id: team._id,
+          name: team.name,
+          companyName: team.companyName,
+          score: team.score
+        }
+      });
+    }
+
+    res.status(200).json({ 
+      message: 'Team deleted successfully',
+      teamId: team._id,
+      leaderboard: teams
+    });
+  } catch (error) {
+    console.error('Error deleting team:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+/**
+ * Update team details
+ * @route PUT /api/teams/:teamId
+ * @access Public
+ */
+export const updateTeamDetails = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const teamId = req.params.teamId;
+    const { name, companyName, score } = req.body;
+
+    if (!teamId) {
+      res.status(400).json({ message: 'Team ID is required' });
+      return;
+    }
+
+    // Find the team
+    const team = await Team.findById(teamId);
+    if (!team) {
+      res.status(404).json({ message: 'Team not found' });
+      return;
+    }
+
+    // Check if another team with the same name exists (only if name is being updated)
+    if (name && name !== team.name) {
+      const existingTeam = await Team.findOne({ name });
+      if (existingTeam) {
+        res.status(400).json({ message: 'Another team with this name already exists' });
+        return;
+      }
+    }
+
+    // Update team details
+    if (name) team.name = name;
+    if (companyName) team.companyName = companyName;
+    if (score !== undefined) team.score = parseInt(score) || 0;
+
+    await team.save();
+
+    // Get all teams sorted by score
+    const teams = await Team.find().sort({ score: -1 });
+
+    // Emit the updated leaderboard to all connected clients
+    const io = getIo();
+    if (io) {
+      io.emit('teamUpdated', { 
+        teams,
+        updatedTeam: {
+          _id: team._id,
+          name: team.name,
+          companyName: team.companyName,
+          score: team.score
+        }
+      });
+    }
+
+    res.status(200).json({ 
+      message: 'Team details updated successfully',
+      team,
+      leaderboard: teams
+    });
+  } catch (error) {
+    console.error('Error updating team details:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};

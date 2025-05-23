@@ -164,6 +164,13 @@ export default function Page() {
                     >
                       {team.name}
                     </motion.h2>
+                    {team.companyName && (
+                      <motion.p 
+                        className='text-xs sm:text-sm text-center text-brand/80 truncate'
+                      >
+                        {team.companyName}
+                      </motion.p>
+                    )}
                   </div>
                   
                   {/* Score with animation */}

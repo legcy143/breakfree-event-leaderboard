@@ -1,5 +1,13 @@
 import { Router } from 'express';
-import { getTeams, initializeTeams, updateTeamScore, resetTeamScores, addTeam } from '../controllers/team.controller';
+import { 
+  getTeams, 
+  initializeTeams, 
+  updateTeamScore, 
+  resetTeamScores, 
+  addTeam,
+  deleteTeam,
+  updateTeamDetails 
+} from '../controllers/team.controller';
 
 const router = Router();
 
@@ -17,5 +25,11 @@ router.put('/score', updateTeamScore);
 
 // Reset all team scores to zero
 router.put('/reset', resetTeamScores);
+
+// Delete a team
+router.delete('/:teamId', deleteTeam);
+
+// Update team details
+router.put('/:teamId', updateTeamDetails);
 
 export default router;
