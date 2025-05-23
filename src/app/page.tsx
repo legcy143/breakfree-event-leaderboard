@@ -143,13 +143,13 @@ export default function Page() {
                   </motion.div>
                   
                   {/* Team logo with animation */}
-                  <motion.img 
+                  {/* <motion.img 
                     src={team.img} 
                     className='h-6 sm:h-8 md:h-10 lg:h-12 w-[30%] max-w-[150px] object-contain mr-auto'
                     alt={team.name}
                     animate={{ scale: wasUpdated ? [1, 1.1, 1] : 1 }}
                     transition={{ duration: 0.5 }}
-                  />
+                  /> */}
                   
                   {/* Team name */}
                   <motion.h2 

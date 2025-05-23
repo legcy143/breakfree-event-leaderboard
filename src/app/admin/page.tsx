@@ -90,7 +90,7 @@ export default function AdminPage() {
         }}>
         <div className="flex flex-col items-center gap-4">
           <img src={assets.logo} className="h-20 w-auto" alt="Breakfree Logo" />
-          <div className="animate-pulse text-2xl text-brand font-bold">Loading teams...</div>
+          <div className="animate-pulse text-2xl text-gray-800 font-bold">Loading teams...</div>
         </div>
       </div>
     )
@@ -147,7 +147,7 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {/* Team Selection Section - improved padding and grid responsiveness */}
           <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-brand mb-3 sm:mb-4">1. Select Team</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">1. Select Team</h2>
             
             {/* Responsive grid that adapts to different screen sizes */}
             <div className="grid grid-cols-2 gap-2 xs:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4">
@@ -163,8 +163,8 @@ export default function AdminPage() {
                   }`}
                   onClick={() => setSelectedTeam(team)}
                 >
-                  <img src={team.img} alt={team.name} className="h-8 sm:h-10 md:h-12 object-contain mb-1 sm:mb-2" />
-                  <p className="text-xs sm:text-sm font-medium text-center text-brand line-clamp-2 min-h-[2.5em]">{team.name}</p>
+                  {/* <img src={team.img} alt={team.name} className="h-8 sm:h-10 md:h-12 object-contain mb-1 sm:mb-2" /> */}
+                  <p className="text-xs sm:text-sm font-medium text-center text-gray-800 line-clamp-2 min-h-[2.5em]">{team.name}</p>
                   <motion.p 
                     key={`score-${team.name}-${team.score}`}
                     initial={{ scale: lastUpdated?.name === team.name ? 1.5 : 1 }}
@@ -182,7 +182,7 @@ export default function AdminPage() {
           {/* Numpad Section - better spacing for small screens */}
           <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
             <div className="flex justify-between items-center mb-3 sm:mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-brand">2. Enter Points</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">2. Enter Points</h2>
               
               {/* Add/Deduct Toggle Button */}
               <motion.div 
@@ -206,9 +206,9 @@ export default function AdminPage() {
                 key={`selected-${selectedTeam.name}-${selectedTeam.score}`}
                 className="mb-3 sm:mb-4 flex items-center gap-2"
               >
-                <img src={selectedTeam.img} alt={selectedTeam.name} className="h-6 sm:h-8 w-auto object-contain" />
+                {/* <img src={selectedTeam.img} alt={selectedTeam.name} className="h-6 sm:h-8 w-auto object-contain" /> */}
                 <div>
-                  <p className="font-medium text-brand text-sm sm:text-base">{selectedTeam.name}</p>
+                  <p className="font-medium  text-sm sm:text-base">{selectedTeam.name}</p>
                   <p className="text-xs sm:text-sm text-gray-600">Current score: {selectedTeam.score}</p>
                 </div>
               </motion.div>
@@ -227,7 +227,7 @@ export default function AdminPage() {
               }}
             >
               <span className={`text-2xl sm:text-3xl font-bold ${
-                isDeduction ? "text-amber-600" : "text-brand"
+                isDeduction ? "text-amber-600" : "text-gray-800"
               }`}>{isDeduction ? "-" : ""}{points || '0'}</span>
             </motion.div>
             
