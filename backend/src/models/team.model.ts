@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 // Interface for Team document
 export interface ITeam extends Document {
@@ -20,7 +20,9 @@ const teamSchema: Schema = new Schema(
     },
     img: {
       type: String,
-      required: true,
+      required: false,
+      default: "",
+      trim: true,
     },
     score: {
       type: Number,
@@ -34,6 +36,6 @@ const teamSchema: Schema = new Schema(
 );
 
 // Create the Team model
-const Team = mongoose.model<ITeam>('Team', teamSchema);
+const Team = mongoose.model<ITeam>("Team", teamSchema);
 
 export default Team;
