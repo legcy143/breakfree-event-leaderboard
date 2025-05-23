@@ -18,7 +18,7 @@ RUN npm run build
 # Set hardcoded production environment
 ENV NODE_ENV=production
 ENV PORT=8000
-ENV MONGODB_URI=mongodb://mongodb:27017/breakfree-leaderboard
+ENV MONGODB_URI=mongodb://mongodb:27017/wt25-leaderboard
 ENV CORS_ORIGIN=https://break-free.gokapturehub.com
 
 # Expose the port

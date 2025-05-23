@@ -8,13 +8,19 @@ import { useTeams } from '../provider'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function AdminPage() {
-  const { teams, updateTeamScore, isLoading, lastUpdated } = useTeams()
+  const { teams, updateTeamScore, addNewTeam, isLoading, lastUpdated } = useTeams()
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   const [points, setPoints] = useState<string>('')
   const [showSuccess, setShowSuccess] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [successMessage, setSuccessMessage] = useState<string>('')
   const [isDeduction, setIsDeduction] = useState<boolean>(false)
+  
+  // New team form state
+  const [newTeamName, setNewTeamName] = useState<string>('')
+  const [newTeamCompany, setNewTeamCompany] = useState<string>('')
+  const [newTeamScore, setNewTeamScore] = useState<string>('0')
+  const [activeTab, setActiveTab] = useState<'update' | 'add'>('update')
 
   // Update selected team if the team data changes
   useEffect(() => {
@@ -75,6 +81,46 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Error updating score:', error)
+      setSubmitting(false)
+    }
+  }
+  
+  // Function to handle adding a new team
+  const handleAddTeam = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!newTeamName || !newTeamCompany || submitting) return
+    
+    try {
+      setSubmitting(true)
+      
+      // Call the addNewTeam function from context
+      const result = await addNewTeam(newTeamName, newTeamCompany, newTeamScore || '0')
+      
+      if (result) {
+        // Set success message
+        setSuccessMessage(`Team "${newTeamName}" created successfully`)
+        
+        // Show success message
+        setShowSuccess(true)
+        
+        // Reset form
+        setNewTeamName('')
+        setNewTeamCompany('')
+        setNewTeamScore('0')
+        
+        // Reset after 3 seconds
+        setTimeout(() => {
+          setShowSuccess(false)
+          setSubmitting(false)
+          setSuccessMessage('')
+        }, 3000)
+      } else {
+        console.error('Failed to create team')
+        setSubmitting(false)
+      }
+    } catch (error) {
+      console.error('Error creating team:', error)
       setSubmitting(false)
     }
   }
@@ -143,15 +189,30 @@ export default function AdminPage() {
           )}
         </AnimatePresence>
 
+        {/* Tabs for switching between update and add modes */}
+        <div className="flex mb-4 border-b border-gray-200">
+          <button 
+            onClick={() => setActiveTab('update')}
+            className={`py-2 px-4 text-lg font-medium ${activeTab === 'update' ? 'border-b-2 border-brand text-brand' : 'text-gray-500 hover:text-brand'}`}
+          >
+            Update Scores
+          </button>
+          <button 
+            onClick={() => setActiveTab('add')}
+            className={`py-2 px-4 text-lg font-medium ${activeTab === 'add' ? 'border-b-2 border-brand text-brand' : 'text-gray-500 hover:text-brand'}`}
+          >
+            Add New Team
+          </button>
+        </div>
+
         {/* Stack grid vertically on mobile, side by side on larger screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-          {/* Team Selection Section - improved padding and grid responsiveness */}
-          <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">1. Select Team</h2>
-            
-            {/* Responsive grid that adapts to different screen sizes */}
+        {activeTab === 'update' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+            {/* Team Selection Section - improved padding and grid responsiveness */}
+            <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-brand mb-3 sm:mb-4">1. Select Team</h2>              {/* Responsive grid that adapts to different screen sizes */}
             <div className="grid grid-cols-2 gap-2 xs:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4">
-              {teams.map((team, index) => (
+              {teams.map((team) => (
                 <motion.div 
                   key={team.name} 
                   whileHover={{ scale: 1.05 }}
@@ -163,8 +224,11 @@ export default function AdminPage() {
                   }`}
                   onClick={() => setSelectedTeam(team)}
                 >
-                  {/* <img src={team.img} alt={team.name} className="h-8 sm:h-10 md:h-12 object-contain mb-1 sm:mb-2" /> */}
-                  <p className="text-xs sm:text-sm font-medium text-center text-gray-800 line-clamp-2 min-h-[2.5em]">{team.name}</p>
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-brand/20 flex items-center justify-center mb-2">
+                    <span className="text-brand font-bold text-lg">{team.name.charAt(0)}</span>
+                  </div>
+                  <p className="text-xs sm:text-sm font-medium text-center text-brand line-clamp-2 min-h-[2.5em]">{team.name}</p>
+                  <div className="text-xs text-gray-500">{team.companyName}</div>
                   <motion.p 
                     key={`score-${team.name}-${team.score}`}
                     initial={{ scale: lastUpdated?.name === team.name ? 1.5 : 1 }}
@@ -197,20 +261,20 @@ export default function AdminPage() {
                   <span>{isDeduction ? "- Deduct" : "+ Add"}</span>
                 </Button>
               </motion.div>
-            </div>
-            
-            {selectedTeam ? (
-              <motion.div 
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                key={`selected-${selectedTeam.name}-${selectedTeam.score}`}
-                className="mb-3 sm:mb-4 flex items-center gap-2"
-              >
-                {/* <img src={selectedTeam.img} alt={selectedTeam.name} className="h-6 sm:h-8 w-auto object-contain" /> */}
-                <div>
-                  <p className="font-medium  text-sm sm:text-base">{selectedTeam.name}</p>
-                  <p className="text-xs sm:text-sm text-gray-600">Current score: {selectedTeam.score}</p>
-                </div>
+            </div>              {selectedTeam ? (
+                <motion.div 
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  key={`selected-${selectedTeam.name}-${selectedTeam.score}`}
+                  className="mb-3 sm:mb-4 flex items-center gap-2"
+                >
+                  <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center">
+                    <span className="text-brand font-bold">{selectedTeam.name.charAt(0)}</span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-brand text-sm sm:text-base">{selectedTeam.name}</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Current score: {selectedTeam.score}</p>
+                  </div>
               </motion.div>
             ) : (
               <p className="mb-3 sm:mb-4 text-gray-500 italic text-sm sm:text-base">Please select a team first</p>
@@ -276,6 +340,80 @@ export default function AdminPage() {
             </motion.div>
           </div>
         </div>
+        ) : (
+          // Add New Team Form
+          <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-brand mb-3 sm:mb-4">Add New Team</h2>
+            
+            <form onSubmit={handleAddTeam} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="teamName" className="block text-sm font-medium text-gray-700">
+                  Team Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="teamName"
+                  value={newTeamName}
+                  onChange={(e) => setNewTeamName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand"
+                  placeholder="Enter team name"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+                  Company Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="companyName"
+                  value={newTeamCompany}
+                  onChange={(e) => setNewTeamCompany(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand"
+                  placeholder="Enter company name"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="initialScore" className="block text-sm font-medium text-gray-700">
+                  Initial Score
+                </label>
+                <input
+                  type="number"
+                  id="initialScore"
+                  value={newTeamScore}
+                  onChange={(e) => setNewTeamScore(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand focus:border-brand"
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
+              
+              <div className="pt-4">
+                <Button
+                  color="primary"
+                  type="submit"
+                  disabled={submitting || !newTeamName || !newTeamCompany}
+                  className="w-full justify-center py-3"
+                >
+                  {submitting ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating...
+                    </span>
+                  ) : (
+                    'Create Team'
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </main>
   )

@@ -3,7 +3,7 @@
 
 export default {
   port: process.env.PORT || 8081,
-  mongodbUri: process.env.MONGODB_URI || 'mongodb://mongodb:27017/breakfree-leaderboard',
+  mongodbUri: process.env.MONGODB_URI || 'mongodb://mongodb:27017/wt25-leaderboard',
   nodeEnv: process.env.NODE_ENV || 'production',
   corsOrigin: process.env.CORS_ORIGIN || 'https://break-free.gokapturehub.com'
 };

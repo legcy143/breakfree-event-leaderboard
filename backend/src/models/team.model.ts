@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 // Interface for Team document
 export interface ITeam extends Document {
   name: string;
-  img: string;
+  companyName: string;
   score: number;
   createdAt: Date;
   updatedAt: Date;
@@ -18,10 +18,9 @@ const teamSchema: Schema = new Schema(
       unique: true,
       trim: true,
     },
-    img: {
+    companyName: {
       type: String,
-      required: false,
-      default: "",
+      required: true,
       trim: true,
     },
     score: {
@@ -31,7 +30,7 @@ const teamSchema: Schema = new Schema(
     },
   },
   {
-    timestamps: true, // Automatically manage createdAt and updatedAt
+    timestamps: true,
   }
 );
 

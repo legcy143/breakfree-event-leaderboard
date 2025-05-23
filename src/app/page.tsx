@@ -15,11 +15,14 @@ export default function Page() {
   // Track previous team order for proper animations
   useEffect(() => {
     if (teams.length > 0) {
+      // Sort teams by score in descending order (same as in render)
+      const sortedTeamsLocal = [...teams].sort((a, b) => parseInt(b.score) - parseInt(a.score));
+      
       // Save current team positions for animation reference
       const ranks: { [key: string]: number } = {}
-      const newTeamOrder = teams.map(t => t.name)
+      const newTeamOrder = sortedTeamsLocal.map(t => t.name)
 
-      teams.forEach((team, index) => {
+      sortedTeamsLocal.forEach((team, index) => {
         ranks[team.name] = index
       })
 
@@ -40,7 +43,7 @@ export default function Page() {
   const getTeamMovement = (teamName: string) => {
     if (!previousRanks || Object.keys(previousRanks).length === 0) return null;
     
-    const currentIndex = teams.findIndex(t => t.name === teamName);
+    const currentIndex = sortedTeams.findIndex(t => t.name === teamName);
     const previousIndex = previousRanks[teamName] ?? currentIndex;
     
     if (currentIndex < previousIndex) return "up";
@@ -65,6 +68,9 @@ export default function Page() {
     )
   }
 
+  // Sort teams by score in descending order
+  const sortedTeams = [...teams].sort((a, b) => parseInt(b.score) - parseInt(a.score));
+  
   return (
     <main
       className='min-h-[100dvh] overflow-x-hidden pb-4'
@@ -87,16 +93,22 @@ export default function Page() {
       <h1 className='text-center uppercase text-2xl sm:text-3xl lg:text-5xl font-bold text-brand mt-1 mb-4 sm:mb-8 lg:mb-16'>live scoreboard</h1>
       
       {/* Animated leaderboard */}
-      <section className='p-2 max-w-[70rem] mx-auto px-2 sm:px-4 flex-1 overflow-y-auto'>
+      <motion.section 
+        className='p-2 max-w-[70rem] mx-auto px-2 sm:px-4 flex-1 overflow-y-auto'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="relative">
           <AnimatePresence>
-            {teams.map((team, index) => {
+            {sortedTeams.slice(0, 10).map((team, index) => {
               const teamMovement = getTeamMovement(team.name);
               const wasUpdated = animatingTeam === team.name;
               
               return (
                 <motion.div
                   layout
+                  layoutId={`team-${team.name}`}
                   key={team.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ 
@@ -105,12 +117,15 @@ export default function Page() {
                     backgroundColor: wasUpdated ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0)",
                     transition: {
                       type: teamMovement ? "spring" : "tween",
-                      stiffness: 300,
-                      damping: 30,
-                      duration: teamMovement ? 0.8 : 0.3
+                      stiffness: 400,
+                      damping: 35,
+                      duration: teamMovement ? 0.8 : 0.5
                     }
                   }}
-                  exit={{ opacity: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{
+                    layout: { type: "spring", stiffness: 350, damping: 25 }
+                  }}
                   className={`flex justify-between items-center p-2 sm:p-3 md:p-4 gap-2 sm:gap-3 lg:gap-10 border-b border-brand/20 rounded-lg relative mb-1 ${
                     wasUpdated ? 'ring-2 ring-brand' : ''
                   } ${teamMovement === "up" ? "z-10" : ""}`}
@@ -142,21 +157,21 @@ export default function Page() {
                     {index + 1}
                   </motion.div>
                   
-                  {/* Team logo with animation */}
-                  {/* <motion.img 
-                    src={team.img} 
-                    className='h-6 sm:h-8 md:h-10 lg:h-12 w-[30%] max-w-[150px] object-contain mr-auto'
-                    alt={team.name}
-                    animate={{ scale: wasUpdated ? [1, 1.1, 1] : 1 }}
-                    transition={{ duration: 0.5 }}
-                  /> */}
-                  
                   {/* Team name */}
-                  <motion.h2 
-                    className='text-sm sm:text-base md:text-xl lg:text-2xl w-full text-center font-bold text-brand mr-auto truncate'
-                  >
-                    {team.name}
-                  </motion.h2>
+                  <div className="flex flex-col w-full mr-auto">
+                    <motion.h2 
+                      className='text-sm sm:text-base md:text-xl lg:text-2xl w-full text-center font-bold text-brand truncate'
+                    >
+                      {team.name}
+                    </motion.h2>
+                    {team.companyName && (
+                      <motion.p 
+                        className='text-xs sm:text-sm text-center text-brand/80 truncate'
+                      >
+                        {team.companyName}
+                      </motion.p>
+                    )}
+                  </div>
                   
                   {/* Score with animation */}
                   <motion.div className="relative">
@@ -167,7 +182,12 @@ export default function Page() {
                         color: wasUpdated ? 
                           ["#00a99d", "#ff9d00", "#00a99d"] : "#00a99d" 
                       }}
-                      transition={{ duration: 0.8 }}
+                      transition={{ 
+                        duration: 0.8,
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 15
+                      }}
                     >
                       {team.score}
                     </motion.h2>
@@ -223,8 +243,14 @@ export default function Page() {
               );
             })}
           </AnimatePresence>
+          
+          {sortedTeams.length > 10 && (
+            <div className="text-center mt-4 text-sm text-brand/70 italic">
+              Showing top 10 teams out of {sortedTeams.length} total
+            </div>
+          )}
         </div>
-      </section>
+      </motion.section>
     </main>
   )
 }

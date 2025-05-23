@@ -2,6 +2,7 @@ import { io, Socket } from 'socket.io-client';
 
 // Hardcoded API URL for Docker environment
 const API_URL = 'https://break-free-backend.gokapturehub.com/';
+// const API_URL = 'http://localhost:8081/';
 
 /**
  * Initialize Socket.IO connection

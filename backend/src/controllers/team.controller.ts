@@ -41,7 +41,7 @@ export const initializeTeams = async (req: Request, res: Response): Promise<void
     // Create teams with scores as numbers
     const teamsToCreate = teams.map(team => ({
       name: team.name,
-      img: team.img,
+      companyName: team.companyName,
       score: parseInt(team.score) || 0
     }));
 
@@ -92,7 +92,8 @@ export const updateTeamScore = async (req: Request, res: Response): Promise<void
       io.emit('scoreUpdate', { 
         teams: leaderboard, 
         updatedTeam: { 
-          name: team.name, 
+          name: team.name,
+          companyName: team.companyName,
           score: team.score 
         } 
       });
@@ -131,6 +132,56 @@ export const resetTeamScores = async (req: Request, res: Response): Promise<void
     res.status(200).json({ message: 'All team scores reset to zero', teams });
   } catch (error) {
     console.error('Error resetting team scores:', error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+/**
+ * Add a new team
+ * @route POST /api/teams/add
+ * @access Public
+ */
+export const addTeam = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { name, companyName, score } = req.body;
+
+    if (!name || !companyName) {
+      res.status(400).json({ message: 'Name and company name are required' });
+      return;
+    }
+
+    // Check if team with same name already exists
+    const existingTeam = await Team.findOne({ name });
+    if (existingTeam) {
+      res.status(400).json({ message: 'Team with this name already exists' });
+      return;
+    }
+
+    // Create the new team
+    const newTeam = new Team({
+      name,
+      companyName,
+      score: parseInt(score) || 0
+    });
+
+    await newTeam.save();
+
+    // Get all teams sorted by score
+    const teams = await Team.find().sort({ score: -1 });
+
+    // Emit the updated leaderboard to all connected clients
+    const io = getIo();
+    if (io) {
+      io.emit('scoreUpdate', { teams });
+    }
+
+    res.status(201).json({ 
+      message: 'Team added successfully',
+      team: newTeam,
+      leaderboard: teams
+    });
+  } catch (error) {
+    console.error('Error adding team:', error);
     res.status(500).json({ message: 'Server Error' });
   }
 };

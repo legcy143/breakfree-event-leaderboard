@@ -53,6 +53,7 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
           teams: leaderboard,
           updatedTeam: {
             name: team.name,
+            companyName: team.companyName,
             score: team.score
           }
         });
@@ -60,6 +61,44 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
         console.log(`Score updated for team ${teamName}: ${pointsToAdd > 0 ? '+' : ''}${pointsToAdd} points`);
       } catch (error) {
         console.error('Error updating score via socket:', error);
+      }
+    });
+
+    // Listen for add team events
+    socket.on('addTeam', async (data: { name: string; companyName: string; score: string }) => {
+      try {
+        const { name, companyName, score } = data;
+        
+        if (!name || !companyName) {
+          console.error('Invalid add team request: missing name or company name');
+          return;
+        }
+        
+        // Check if team with same name already exists
+        const existingTeam = await Team.findOne({ name });
+        if (existingTeam) {
+          console.error(`Team with name already exists: ${name}`);
+          return;
+        }
+        
+        // Create the new team
+        const newTeam = new Team({
+          name,
+          companyName,
+          score: parseInt(score) || 0
+        });
+        
+        await newTeam.save();
+        
+        // Get all teams sorted by score
+        const leaderboard = await Team.find().sort({ score: -1 });
+        
+        // Emit the updated leaderboard to all connected clients
+        io?.emit('scoreUpdate', { teams: leaderboard });
+        
+        console.log(`New team added: ${name} (${companyName})`);
+      } catch (error) {
+        console.error('Error adding team via socket:', error);
       }
     });
 
