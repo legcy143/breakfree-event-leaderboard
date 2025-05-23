@@ -94,7 +94,7 @@ export default function Provider({ children }: { children: ReactNode }) {
           if (data.updatedTeam) {
             setLastUpdated({
               name: data.updatedTeam.name,
-              img: formattedTeams.find((t: any) => t.name === data.updatedTeam.name)?.img || '',
+              // img: formattedTeams.find((t: any) => t.name === data.updatedTeam.name)?.img || '',
               score: String(data.updatedTeam.score),
             });
             
