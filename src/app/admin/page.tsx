@@ -576,7 +576,7 @@ export default function AdminPage() {
                         </Button>
                         <Button
                           color="danger"
-                          onClick={() => setShowDeleteConfirm(team.id)}
+                          onPress={() => setShowDeleteConfirm(team.id || team.name)}
                           size="sm"
                         >
                           Delete
