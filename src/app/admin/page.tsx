@@ -325,7 +325,7 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {/* Team Selection Section - improved padding and grid responsiveness */}
             <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-brand mb-3 sm:mb-4">1. Select Team</h2>              
+              <h2 className="text-xl sm:text-2xl font-bold text-brand-secondary mb-3 sm:mb-4">1. Select Team</h2>              
               {/* Responsive grid that adapts to different screen sizes */}
               <div className="grid grid-cols-2 gap-2 xs:grid-cols-3 sm:gap-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4">
                 {teams.map((team) => (
@@ -336,14 +336,14 @@ export default function AdminPage() {
                     animate={lastUpdated?.name === team.name ? { backgroundColor: ['rgba(0,169,157,0.1)', 'rgba(0,169,157,0.3)', 'rgba(0,169,157,0.1)'] } : {}}
                     transition={{ duration: 1 }}
                     className={`cursor-pointer p-2 sm:p-3 border-2 rounded-lg flex flex-col items-center transition-all ${
-                      selectedTeam?.name === team.name ? 'border-brand bg-brand/10' : 'border-gray-200 hover:border-brand/50'
+                      selectedTeam?.name === team.name ? 'border-brand-secondary bg-brand/10' : 'border-gray-200 hover:border-brand/50'
                     }`}
                     onClick={() => setSelectedTeam(team)}
                   >
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-brand/20 flex items-center justify-center mb-2">
-                      <span className="text-brand font-bold text-lg">{team.name.charAt(0)}</span>
+                      <span className="text-brand-secondary font-bold text-lg">{team.name.charAt(0)}</span>
                     </div>
-                    <p className="text-xs sm:text-sm font-medium text-center text-brand line-clamp-2 min-h-[2.5em]">{team.name}</p>
+                    <p className="text-xs sm:text-sm font-medium text-center text-brand-secondary line-clamp-2 min-h-[2.5em]">{team.name}</p>
                     <div className="text-xs text-gray-500">{team.companyName}</div>
                     <motion.p 
                       key={`score-${team.name}-${team.score}`}
@@ -386,10 +386,10 @@ export default function AdminPage() {
                   className="mb-3 sm:mb-4 flex items-center gap-2"
                 >
                   <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center">
-                    <span className="text-brand font-bold">{selectedTeam.name.charAt(0)}</span>
+                    <span className="text-brand-secondary font-bold">{selectedTeam.name.charAt(0)}</span>
                   </div>
                   <div>
-                    <p className="font-medium text-brand text-sm sm:text-base">{selectedTeam.name}</p>
+                    <p className="font-medium text-brand-secondary text-sm sm:text-base">{selectedTeam.name}</p>
                     <p className="text-xs sm:text-sm text-gray-600">Current score: {selectedTeam.score}</p>
                   </div>
                 </motion.div>
@@ -460,7 +460,7 @@ export default function AdminPage() {
         ) : activeTab === 'add' ? (
           // Add New Team Form
           <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-brand mb-3 sm:mb-4">Add New Team</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-brand-secondary mb-3 sm:mb-4">Add New Team</h2>
             
             <form onSubmit={handleAddTeam} className="space-y-4">
               <div className="space-y-2">
@@ -533,7 +533,7 @@ export default function AdminPage() {
         ) : (
           // Manage Teams: List all teams with edit and delete options
           <div className="bg-white/90 rounded-lg shadow-lg p-3 sm:p-4 md:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-brand mb-3 sm:mb-4">Manage Teams</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-brand-secondary mb-3 sm:mb-4">Manage Teams</h2>
             
             {/* List of teams */}
             <div className="overflow-hidden mb-6">
@@ -552,7 +552,7 @@ export default function AdminPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-brand/20 flex items-center justify-center">
-                            <span className="text-brand font-medium">{team.name.charAt(0)}</span>
+                            <span className="text-brand-secondary font-medium">{team.name.charAt(0)}</span>
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-medium text-gray-900">{team.name}</div>
