@@ -158,20 +158,20 @@ export default function Page() {
                   </motion.div>
                   
                   {/* Team name */}
-                  <div className="flex flex-col w-full mr-auto">
+                  {/* <div className="flex flex-row text-center gap-10  mr-auto bg-red-500 w-[50%]"> */}
                     <motion.h2 
-                      className='text-sm sm:text-base md:text-xl lg:text-2xl w-full text-center font-bold text-brand truncate'
+                      className='text-sm sm:text-base md:text-xl lg:text-2xl w-[50%] font-bold text-brand truncate'
                     >
                       {team.name}
                     </motion.h2>
+                  {/* </div> */}
                     {team.companyName && (
                       <motion.p 
-                        className='text-xs sm:text-sm text-center text-brand/80 truncate'
+                        className='text-xs sm:text-sm mr-auto w-full text-center  text-brand/80 truncate'
                       >
                         {team.companyName}
                       </motion.p>
                     )}
-                  </div>
                   
                   {/* Score with animation */}
                   <motion.div className="relative">
