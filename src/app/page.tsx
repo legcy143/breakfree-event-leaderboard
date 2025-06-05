@@ -84,11 +84,11 @@ export default function Page() {
       {/* More responsive header with flexible layout */}
       <div className='h-auto min-h-[4rem] px-3 sm:px-5 py-2 flex flex-wrap justify-between items-center gap-2'>
         <img src={assets.logo} className='h-12 sm:h-16 w-auto object-contain mx-auto md:mx-0' />
-        <Link href="/admin" className="mx-auto md:mx-0">
+        {/* <Link href="/admin" className="mx-auto md:mx-0">
           <Button color="primary" variant="solid" className="text-xs sm:text-sm font-bold whitespace-nowrap">
             Manage Scores
           </Button>
-        </Link>
+        </Link> */}
       </div>
       
       <h1 className='text-center uppercase text-2xl sm:text-3xl lg:text-5xl font-bold text-brand mt-1 mb-4 sm:mb-8 lg:mb-16'>live scoreboard</h1>
@@ -170,14 +170,14 @@ export default function Page() {
                   {/* Team name */}
                   {/* <div className="flex flex-row text-center gap-10  mr-auto bg-red-500 w-[50%]"> */}
                     <motion.h2 
-                      className='text-sm sm:text-base md:text-xl lg:text-2xl w-[50%] font-bold text-brand truncate'
+                      className='text-sm sm:text-base md:text-xl lg:text-2xl w-[50%] font-bold text-brand truncate capitalize'
                     >
                       {team.name}
                     </motion.h2>
                   {/* </div> */}
                     {team.companyName && (
                       <motion.p 
-                        className='text-xs sm:text-sm mr-auto w-full text-center font-bold  text-brand/80 truncate'
+                        className='text-sm sm:text-base md:text-xl lg:text-2xl mr-auto w-full text-center font-bold  text-brand/80 truncate capitalize'
                       >
                         {team.companyName}
                       </motion.p>
