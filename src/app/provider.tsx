@@ -190,7 +190,6 @@ export default function Provider({ children }: { children: ReactNode }) {
       }
     };
   }, []); // Empty dependency array means this runs once on mount
-
   // Fetch teams from the API
   const fetchTeams = async () => {
     try {
@@ -209,9 +208,14 @@ export default function Provider({ children }: { children: ReactNode }) {
           }));
           
           setTeams(formattedTeams);
-        } else {
-          // If no teams in the database, initialize them
+        } else if (initialTeamsData.length > 0) {
+          // If no teams in the database and we have initial data, initialize them
+          // We'll avoid calling fetchTeams again from inside initializeTeams
           await initializeTeams();
+        } else {
+          // If there's no data and no initial teams, just set empty array
+          setTeams([]);
+          console.log('No teams found and no initial data to populate');
         }
       } else {
         console.error('Failed to fetch teams:', await response.text());
@@ -222,7 +226,6 @@ export default function Provider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   };
-
   // Initialize teams in the database if needed
   const initializeTeams = async () => {
     try {
@@ -236,8 +239,9 @@ export default function Provider({ children }: { children: ReactNode }) {
 
       if (response.ok) {
         console.log('Teams initialized in the database');
-        // Fetch teams again after initializing
-        await fetchTeams();
+        // Instead of calling fetchTeams again (which can cause an infinite loop),
+        // we'll directly set the teams from our initialTeamsData
+        setTeams(initialTeamsData);
       } else {
         console.error('Failed to initialize teams:', await response.text());
       }
