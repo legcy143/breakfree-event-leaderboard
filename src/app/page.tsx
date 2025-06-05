@@ -67,10 +67,11 @@ export default function Page() {
       </div>
     )
   }
-
   // Sort teams by score in descending order
   const sortedTeams = [...teams].sort((a, b) => parseInt(b.score) - parseInt(a.score));
-  
+    // Check if there is any player data
+  const noTeamData = teams.length === 0;
+
   return (
     <main
       className='min-h-[100dvh] overflow-x-hidden pb-4'
@@ -91,17 +92,26 @@ export default function Page() {
       </div>
       
       <h1 className='text-center uppercase text-2xl sm:text-3xl lg:text-5xl font-bold text-brand mt-1 mb-4 sm:mb-8 lg:mb-16'>live scoreboard</h1>
-      
-      {/* Animated leaderboard */}
-      <motion.section 
+        {/* Animated leaderboard */}      <motion.section 
         className='p-2 max-w-[70rem] mx-auto px-2 sm:px-4 flex-1 overflow-y-auto'
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <div className="relative">
-          <AnimatePresence>
-            {sortedTeams.slice(0, 10).map((team, index) => {
+        transition={{ duration: 0.6 }}      >        {noTeamData ? (
+          <div className="flex flex-col items-center justify-center p-8 rounded-lg bg-white/10 backdrop-blur-sm">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-brand mb-3">Scoreboard Empty</h2>
+              <p className="text-xl text-brand/80">Waiting for participants...</p>
+              <div className="mt-6 animate-pulse">
+                <svg className="w-12 h-12 text-brand/60 mx-auto" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="relative">
+            <AnimatePresence>
+              {sortedTeams.slice(0, 10).map((team, index) => {
               const teamMovement = getTeamMovement(team.name);
               const wasUpdated = animatingTeam === team.name;
               
@@ -167,7 +177,7 @@ export default function Page() {
                   {/* </div> */}
                     {team.companyName && (
                       <motion.p 
-                        className='text-xs sm:text-sm mr-auto w-full text-center  text-brand/80 truncate'
+                        className='text-xs sm:text-sm mr-auto w-full text-center font-bold  text-brand/80 truncate'
                       >
                         {team.companyName}
                       </motion.p>
@@ -247,9 +257,9 @@ export default function Page() {
           {sortedTeams.length > 10 && (
             <div className="text-center mt-4 text-sm text-brand/70 italic">
               Showing top 10 teams out of {sortedTeams.length} total
-            </div>
-          )}
+            </div>          )}
         </div>
+        )}
       </motion.section>
     </main>
   )
